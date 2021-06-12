@@ -1,0 +1,11 @@
+html,
+body {
+  margin: 0px;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+.content {
+  width: 800px;
+  margin: 0 auto;
+}

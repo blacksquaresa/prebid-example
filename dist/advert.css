@@ -1,0 +1,67 @@
+.advert_container {
+  display: flex !important;
+  position: fixed;
+}
+
+.advert_container_left {
+  height: 100%;
+  left: 0;
+  top: 0;
+  margin: auto 0;
+  align-items: center;
+}
+
+.advert_container_right {
+  height: 100%;
+  right: 0;
+  top: 0;
+  margin: auto 0;
+  align-items: center;
+}
+
+.advert_container_bottom {
+  width: 100%;
+  bottom: 0;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.advert_display {
+  position: relative;
+}
+
+.advert_close_button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  padding: 8px;
+  text-align: right;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+  background-color: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.advert_refresh_button {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 20px;
+  padding: 3px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+  background-color: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  box-sizing: border-box;
+  cursor: pointer;
+}

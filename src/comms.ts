@@ -1,9 +1,10 @@
 import { Advert } from "./advert";
+import { AdvertFactory } from "./advertFactory";
 
 const APIURL = "https://60bcfd7fb8ab3700175a005b.mockapi.io/eg/ads";
 
 export class Comms {
-  public async FetchDataFromAPI(): Promise<Advert[]> {
+  public async fetchAdvertsFromAPI(): Promise<Advert[]> {
     try {
       let response = await fetch(APIURL);
       if (!response.ok) {
@@ -17,7 +18,8 @@ export class Comms {
         throw new Error("Data is not an array");
       }
 
-      var result: Advert[] = (data as Array<any>).map(Advert.FromData);
+      var factory = new AdvertFactory();
+      var result: Advert[] = (data as Array<any>).map(factory.fromData);
       return result;
     } catch (err) {
       console.log(

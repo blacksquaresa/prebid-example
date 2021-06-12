@@ -1,253 +1,166 @@
-import { Advert } from "../src/advert";
+import { IApnTag, IAdUnit, Advert } from "../src/advert";
 
-describe("Advert", () => {
-  describe("FromData method", () => {
-    test("fails if the element is null", () => {
-      expect(() => Advert.FromData(null)).toThrow();
-    });
-    test("fails if the element is undefined", () => {
-      expect(() => Advert.FromData(undefined)).toThrow();
-    });
-    test("fails if the unit is missing", () => {
-      expect(() =>
-        Advert.FromData({ id: "id", sizes: [], bids: [] })
-      ).toThrow();
-    });
-    test("fails if the id is missing", () => {
-      expect(() =>
-        Advert.FromData({ unit: "unit", sizes: [], bids: [] })
-      ).toThrow();
-    });
-    test("fails if the sizes is missing", () => {
-      expect(() =>
-        Advert.FromData({ unit: "unit", id: "id", bids: [] })
-      ).toThrow();
-    });
-    test("fails if the sizes is not an array", () => {
-      expect(() =>
-        Advert.FromData({
-          unit: "unit",
-          id: "id",
-          sizes: "notanarray",
-          bids: [],
-        })
-      ).toThrow();
-    });
-    test("fails if a size is not an array", () => {
-      expect(() =>
-        Advert.FromData({
-          unit: "unit",
-          id: "id",
-          sizes: ["notanarray"],
-          bids: [],
-        })
-      ).toThrow();
-    });
-    test("fails if a size array has less than two elements", () => {
-      expect(() =>
-        Advert.FromData({
-          unit: "unit",
-          id: "id",
-          sizes: [[1]],
-          bids: [],
-        })
-      ).toThrow();
-    });
-    test("fails if a size array has more than two elements", () => {
-      expect(() =>
-        Advert.FromData({
-          unit: "unit",
-          id: "id",
-          sizes: [[1, 2, 3]],
-          bids: [],
-        })
-      ).toThrow();
-    });
-    test("fails if the bids is missing", () => {
-      expect(() =>
-        Advert.FromData({
-          unit: "unit",
-          id: "id",
-          sizes: [],
-          bids: "notanarray",
-        })
-      ).toThrow();
-    });
-    test("fails if a bid has no bidder", () => {
-      expect(() =>
-        Advert.FromData({
-          unit: "unit",
-          id: "id",
-          sizes: [],
-          bids: [{ params: { placementId: 12345 } }],
-        })
-      ).toThrow();
-    });
-    test("fails if a bid has no params", () => {
-      expect(() =>
-        Advert.FromData({
-          unit: "unit",
-          id: "id",
-          sizes: [],
-          bids: [{ bidder: "bidder" }],
-        })
-      ).toThrow();
-    });
-    test("fails if a bid has no placement Id", () => {
-      expect(() =>
-        Advert.FromData({
-          unit: "unit",
-          id: "id",
-          sizes: [],
-          bids: [{ bidder: "bidder", params: {} }],
-        })
-      ).toThrow();
-    });
-    test("correctly creates an advert", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [],
-        bids: [],
-        refresh: true,
-        positon: "left",
-        closeBtn: true,
-        refreshSettings: { btnClick: "enabled" },
-      });
-      expect(advert.unit).toBe("unit");
-      expect(advert.id).toBe("id");
-      expect(advert.refresh).toBe(true);
-      expect(advert.position).toBe("left");
-      expect(advert.closeBtn).toBe(true);
-      expect(advert.refreshSettings).toEqual(
-        expect.objectContaining({ btnClick: "enabled" })
-      );
-    });
-    test("correctly sets sizes", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [
-          [120, 240],
-          [360, 480],
-        ],
-        bids: [],
-        refresh: true,
-        positon: "left",
-        closeBtn: true,
-        refreshSettings: { btnClick: "enabled" },
-      });
-      expect(advert.sizes).toEqual(
-        expect.arrayContaining([
-          { width: 120, height: 240 },
-          { width: 360, height: 480 },
-        ])
-      );
-    });
-    test("correctly sets bids", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [],
-        bids: [
-          { bidder: "bidder1", params: { placementId: 34567 } },
-          { bidder: "bidder2", params: { placementId: 76543 } },
-        ],
-        refresh: true,
-        positon: "left",
-        closeBtn: true,
-        refreshSettings: { btnClick: "enabled" },
-      });
-      expect(advert.bids).toEqual(
-        expect.arrayContaining([
-          { bidder: "bidder1", placementId: 34567 },
-          { bidder: "bidder2", placementId: 76543 },
-        ])
-      );
-    });
-    test("supports right position", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [],
-        bids: [],
-        refresh: true,
-        positon: "right",
-        closeBtn: true,
-        refreshSettings: { btnClick: "enabled" },
-      });
-      expect(advert.position).toBe("right");
-    });
-    test("defaults to bottom position", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [],
-        bids: [],
-        refresh: true,
-        positon: "anythingElse",
-        closeBtn: true,
-        refreshSettings: { btnClick: "enabled" },
-      });
+describe("Advert Factory", () => {
+  afterEach(() => {
+    // reset JSDom after each test
+    document.body.innerHTML = "";
+  });
+  describe("constructor", () => {
+    test("creates a new advert with defaults", () => {
+      let advert = new Advert("someid", "divid", [], []);
+      expect(advert.unit).toBe("someid");
+      expect(advert.id).toBe("divid");
+      expect(advert.refresh).toBeFalsy();
+      expect(advert.closeBtn).toBeFalsy();
       expect(advert.position).toBe("bottom");
-    });
-    test("uses a delay for a refreshSettings", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [],
-        bids: [],
-        refresh: true,
-        positon: "anythingElse",
-        closeBtn: true,
-        refreshSettings: { delay: 100 },
-      });
-      expect(advert.refreshSettings).toEqual(
-        expect.objectContaining({ delay: 100, repeat: 0 })
-      );
-    });
-    test("uses a repeat for a refreshSettings", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [],
-        bids: [],
-        refresh: true,
-        positon: "anythingElse",
-        closeBtn: true,
-        refreshSettings: { repeat: 50 },
-      });
-      expect(advert.refreshSettings).toEqual(
-        expect.objectContaining({ delay: 0, repeat: 50 })
-      );
-    });
-    test("uses a btnClick for a refreshSettings", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [],
-        bids: [],
-        refresh: true,
-        positon: "anythingElse",
-        closeBtn: true,
-        refreshSettings: { btnClick: "enabled" },
-      });
-      expect(advert.refreshSettings).toEqual(
-        expect.objectContaining({ btnClick: "enabled" })
-      );
-    });
-    test("ignores a btnClick that is not enabled", () => {
-      let advert = Advert.FromData({
-        unit: "unit",
-        id: "id",
-        sizes: [],
-        bids: [],
-        refresh: true,
-        positon: "anythingElse",
-        closeBtn: true,
-        refreshSettings: { btnClick: "disabled" },
-      });
       expect(advert.refreshSettings).toBeUndefined();
+    });
+  });
+  describe("renderToDom method", () => {
+    let apntag: any;
+    beforeEach(() => {
+      apntag = {
+        anq: {
+          push: jest.fn().mockImplementation((func) => func()),
+        },
+        showTag: jest.fn(),
+      };
+      window.apntag = apntag;
+    });
+    test("adds the correct elements to the DOM", () => {
+      let advert = new Advert("someid", "divid", [], []);
+      advert.renderToDom();
+      expect(document.body.children.length).toBe(1);
+      let container: HTMLElement = document.body.children[0] as HTMLElement;
+      expect(container.classList).toContain("advert_container");
+      expect(container.classList).toContain("advert_container_bottom");
+      expect(container.style.display).toBe("none");
+      expect(container.children.length).toBe(1);
+      let adDiv = container.children[0] as HTMLElement;
+      expect(adDiv.id).toBe("divid");
+      expect(adDiv.classList).toContain("advert_display");
+      expect(adDiv.classList).toContain("advert_display_bottom");
+    });
+    test("queues the AST to show the tag", () => {
+      let advert = new Advert("someid", "divid", [], []);
+      advert.renderToDom();
+      expect(apntag.anq.push).toHaveBeenCalled();
+      expect(apntag.showTag).toHaveBeenCalledWith("divid");
+    });
+  });
+  describe("toAdUnit method", () => {
+    test("creates a correct AdUnit", () => {
+      let advert = new Advert(
+        "someid",
+        "divid",
+        [
+          { width: 123, height: 456 },
+          { width: 345, height: 789 },
+        ],
+        [
+          { bidder: "bidder1", params: { placementId: 12345 } },
+          { bidder: "bidder2", params: { placementId: 54321 } },
+        ]
+      );
+      let adUnit = advert.toAdUnit();
+      expect(adUnit.code).toBe("divid");
+      expect(adUnit.mediaTypes.banner.sizes).toEqual(
+        expect.arrayContaining([
+          [123, 456],
+          [345, 789],
+        ])
+      );
+      expect(adUnit.bids).toEqual(
+        expect.arrayContaining([
+          { bidder: "bidder1", params: { placementId: 12345 } },
+          { bidder: "bidder2", params: { placementId: 54321 } },
+        ])
+      );
+    });
+  });
+  describe("toApnTag method", () => {
+    test("creates a correct APN tag", () => {
+      let advert = new Advert(
+        "someid",
+        "divid",
+        [
+          { width: 123, height: 456 },
+          { width: 345, height: 789 },
+        ],
+        [
+          { bidder: "bidder1", params: { placementId: 12345 } },
+          { bidder: "bidder2", params: { placementId: 54321 } },
+        ]
+      );
+      let apnTag = advert.toApnTag();
+      expect(apnTag.tagId).toBe("someid");
+      expect(apnTag.targetId).toBe("divid");
+      expect(apnTag.sizes).toEqual(
+        expect.arrayContaining([
+          [123, 456],
+          [345, 789],
+        ])
+      );
+    });
+  });
+  describe("close method", () => {
+    test("removed references to dom objects", () => {
+      let advert = new Advert("someid", "divid", [], []);
+      advert.renderToDom();
+      expect(advert.adContainer).not.toBeUndefined();
+      expect(advert.adDiv).not.toBeUndefined();
+      expect(document.body.children.length).toBe(1);
+      advert.close();
+      expect(advert.adContainer).toBeUndefined();
+      expect(advert.adDiv).toBeUndefined();
+      expect(document.body.children.length).toBe(0);
+    });
+    test("does not act if the adContainer is already undefined", () => {
+      let advert = new Advert("someid", "divid", [], []);
+      advert.renderToDom();
+      advert.adContainer = undefined;
+      advert.close();
+      expect(advert.adDiv).not.toBeUndefined();
+      expect(document.body.children.length).toBe(1);
+    });
+    test("clears any waiting timeouts", () => {
+      let oldTimeout = window.clearTimeout;
+      window.clearTimeout = jest.fn();
+
+      let advert = new Advert("someid", "divid", [], []);
+      advert.renderToDom();
+      advert.refreshTimeout = 13;
+      advert.close();
+      expect(window.clearTimeout).toHaveBeenCalledWith(13);
+      expect(advert.refreshTimeout).toBeUndefined();
+
+      window.clearTimeout = oldTimeout;
+    });
+  });
+  describe("refreshAdvert method", () => {
+    let apntag: any;
+    beforeEach(() => {
+      apntag = {
+        anq: {
+          push: jest.fn().mockImplementation((func) => func()),
+        },
+        showTag: jest.fn(),
+        refresh: jest.fn(),
+      };
+      window.apntag = apntag;
+    });
+    test("adds the correct elements to the DOM", () => {
+      let advert = new Advert("someid", "divid", [], []);
+      advert.renderToDom();
+      advert.refreshAdvert();
+      expect(apntag.refresh).toHaveBeenCalledWith(
+        expect.arrayContaining(["divid"])
+      );
+    });
+    test("does not refresh if the container is not present", () => {
+      let advert = new Advert("someid", "divid", [], []);
+      advert.refreshAdvert();
+      expect(apntag.showTag).not.toHaveBeenCalled();
     });
   });
 });

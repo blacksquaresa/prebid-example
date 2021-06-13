@@ -102,16 +102,21 @@ var Advert = /** @class */ (function () {
      */
     Advert.prototype.renderToDom = function () {
         var _this = this;
-        this.adContainer = document.createElement("div");
-        this.adContainer.classList.add("advert_container");
-        this.adContainer.classList.add("advert_container_" + this.position);
-        this.adContainer.style.display = "none";
+        var containerId = "container-for-" + this.id;
+        var container = document.getElementById(containerId);
+        if (!container) {
+            container = document.createElement("div");
+            container.classList.add("advert_container");
+            container.classList.add("advert_container_" + this.position);
+            container.style.display = "none";
+            document.body.prepend(container);
+        }
+        this.adContainer = container;
         this.adDiv = document.createElement("div");
         this.adDiv.id = this.id;
         this.adDiv.classList.add("advert_display");
         this.adDiv.classList.add("advert_display_" + this.position);
         this.adContainer.appendChild(this.adDiv);
-        document.body.prepend(this.adContainer);
         this.observer.observe();
         window.apntag.anq.push(function () {
             window.apntag.showTag(_this.id);

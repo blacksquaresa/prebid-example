@@ -43,6 +43,25 @@ This little demonstration is made up of the following components:
 
 ## Notes on the Project
 
+### Usage
+
+A user might use this system by adding the following code snippet to the head of their page:
+
+```
+<link rel="stylesheet" href="advert.css" />
+<script type="text/javascript" src="prebid5.0.0.js" async></script>
+<script type="text/javascript" src="//acdn.adnxs.com/ast/ast.js" async></script>
+<script src="advert.js" defer></script>
+```
+
+If the user knows about the adverts, and would like to place them inline in the page, they can provide placeholders for each advert, and apply whatever CSS they like to the element. the ID for this element must be container-for-_id-of-element_ where _id-of-element_ is the ID as provided by the API data.
+
+```
+<div id="container-for-eg-1-div" class="my-container></div>
+```
+
+If no container is provided for the advert, an absolutely positioned container will be created.
+
 ### Testing
 
 I have added unit tests for a lot of the project. I expect we'd find about 80% coverage. I have not added end-to-end tests.
@@ -55,14 +74,14 @@ I have only tested this on Chrome on Windows (desktop). The CSS and JavaScript u
 
 ### Stickiness
 
-I wasn't quite sure what you meant by sticky. The `position: sticky` option didn't make a lot of sense for the left and right adverts, so I initially used absolutely positioned adverts (that stick to left, right and bottom). In the end, there are two pages to demonstrate this system:
+I wasn't quite sure what was meant by sticky. The `position: sticky` option didn't make a lot of sense for the left and right adverts, so I initially used absolutely positioned adverts (that stick to left, right and bottom). In the end, there are two pages to demonstrate this system using two possible options:
 
 - [Absolutely African Animals](https://www.blacksquare.co.za/prebid-example)
 - [Sticky African Animals](https://www.blacksquare.co.za/prebid-example/sticky.html)
 
 ### Why African Animals?
 
-I like African animals, and I have a lot of photos of them. who doesn't like wild animals? I needed enough content to demonstrate scrolling.
+I like African animals, and I have a lot of photos of them. Who doesn't like wild animals? I needed enough content to demonstrate scrolling.
 
 ### Localhost
 

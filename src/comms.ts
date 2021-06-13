@@ -3,7 +3,20 @@ import { AdvertFactory } from "./advertFactory";
 
 const APIURL = "https://60bcfd7fb8ab3700175a005b.mockapi.io/eg/ads";
 
+/**
+ * The Comms class is used exclusively for communicating to APIs
+ * In this case, there is just one method representing one call
+ *
+ * @export
+ * @class Comms
+ */
 export class Comms {
+  /**
+   * Representing a call to the Adverts API provided for this project.
+   * If the call is successful, this method will return an array of Advert objects
+   *
+   * @return An array of advert objects
+   */
   public async fetchAdvertsFromAPI(): Promise<Advert[]> {
     try {
       let response = await fetch(APIURL);

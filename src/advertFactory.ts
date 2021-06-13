@@ -6,13 +6,22 @@ import {
   IAdvertBidder,
 } from "./advert";
 
+/**
+ * Generates an advert from a data object provided.
+ * This is primarily used in the Comms class to create an advert from the data fetched from the API.
+ *
+ * @export
+ * @class AdvertFactory
+ */
 export class AdvertFactory {
   /**
    * Construct a new Advert from a data object
    * We know the object has come from an external source, so we need to be very careful about constructing the Advert,
-   * so we can trust the structure inside our system
-   * The method is created as a function property to ensure binding with the class,
-   * to allow it to be easily used in a map function.
+   * so we can trust the structure inside our system. Invalid data will throw an error if we cannot use a reasonable default.
+   * The method is created as a function property to ensure binding with the class, to allow it to be easily used in a map function.
+   *
+   * @param element The data object to convert into an Advert
+   * @return The generated advert.
    */
   public fromData = (element: any): Advert => {
     if (
@@ -37,6 +46,13 @@ export class AdvertFactory {
     );
   };
 
+  /**
+   * Converts an array of size arrays (arrays with two number members) into an array of size objects
+   *
+   * @private
+   * @param sizes an array of size arrays
+   * @return an array of size objects
+   */
   private toSizeArray(sizes: any[]): IAdvertSize[] {
     var result: IAdvertSize[] = [];
     sizes.forEach((element) => {
@@ -51,6 +67,13 @@ export class AdvertFactory {
     return result;
   }
 
+  /**
+   * Creates a set of bidder objects, if the input data is well formed. Otherwise, throws an error.
+   *
+   * @private
+   * @param bids the bidder data
+   * @return an array of bidder objects
+   */
   private toBidArray(bids: any[]): IAdvertBidder[] {
     var result: IAdvertBidder[] = [];
     bids.forEach((element) => {
@@ -67,6 +90,13 @@ export class AdvertFactory {
     return result;
   }
 
+  /**
+   * Returns the provided position if it is a valid value, or a default
+   *
+   * @private
+   * @param position the position to check
+   * @return the position if valid, or a default to use
+   */
   private toPosition(position: string): ValidPosition {
     if (~["left", "right", "bottom"].indexOf(position)) {
       return position as ValidPosition;
@@ -75,6 +105,14 @@ export class AdvertFactory {
     return "bottom";
   }
 
+  /**
+   * Generates a unified refresh settings object from the data. This could represent
+   * either a refresh button or the delay and repeat details for an automated refresh.
+   *
+   * @private
+   * @param settings the source data
+   * @return the constructed refresh settings, or undefined if no settings could (or should) be generated
+   */
   private toRefreshSettingsObject(
     settings: any
   ): IAdvertRefreshSettings | undefined {

@@ -3,6 +3,10 @@ import * as pbjs from "./prebid";
 import * as apntag from "./appNexus";
 import { AdvertService } from "./advertService";
 
+/**
+ * Entry point for this application.
+ * This section contains very little code, and mainly just orchestrates the initial load.
+ */
 (async function (global) {
   let comms = new Comms();
   let adverts = await comms.fetchAdvertsFromAPI();

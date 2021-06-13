@@ -1,7 +1,25 @@
 import * as apntag from "./appNexus";
 import { AdvertObserver } from "./advertObserver";
 
+/**
+ * Represents a single advert. Contains all the information about the advert,
+ * and also all the DOM elements and observers associated with the advert.
+ *
+ * @export
+ * @class Advert
+ */
 export class Advert {
+  /**
+   * Creates an instance of the advert from the given data, and initialises an observer.
+   * @param unit The unit value to use for Apn tags.
+   * @param id The ID of the div containing this advert.
+   * @param sizes An array of allowed advert sizes.
+   * @param bids An array of bidders.
+   * @param refresh Whether or not to refresh the advert (using the refreshSettings data). Defaults to false.
+   * @param position The position of the advert on the page. Valid values are "left", "right" and the default "bottom".
+   * @param closeBtn Whether or not to include a close button with the advert. Defaults to false.
+   * @param refreshSettings The settings to use when determining how the advert should be refreshed.
+   */
   constructor(
     public unit: string,
     public id: string,
@@ -38,6 +56,12 @@ export class Advert {
 
   private observer: AdvertObserver;
 
+  /**
+   * Renders the DOM elements for this advert.
+   * There are two elements for the actual advert - the container that
+   * centers it and the div itself that contains the advert.
+   * Also initiates the observer, and requests that the AST service show the tag
+   */
   public renderToDom(): void {
     this.adContainer = document.createElement("div");
     this.adContainer.classList.add("advert_container");
@@ -56,6 +80,11 @@ export class Advert {
     });
   }
 
+  /**
+   * Converts this advert into an adUnit object, used for the PreBid service
+   *
+   * @return The ad unit
+   */
   public toAdUnit(): IAdUnit {
     return {
       code: this.id,
@@ -68,6 +97,11 @@ export class Advert {
     };
   }
 
+  /**
+   * Converts this advert into an APN tag, used for the AST service
+   *
+   * @return The APN tag
+   */
   public toApnTag(): IApnTag {
     return {
       tagId: this.unit,
@@ -76,8 +110,14 @@ export class Advert {
     };
   }
 
+  /**
+   * Closes this advert
+   * All DOM elements are removed from the DOM, and references are removed
+   * Timers are cancelled
+   */
   public close = (): void => {
     if (!this.adContainer) return;
+    this.observer.close();
     this.adContainer.parentNode?.removeChild(this.adContainer);
     this.adDiv = undefined;
     this.adContainer = undefined;
@@ -87,11 +127,20 @@ export class Advert {
     }
   };
 
+  /**
+   * Refreshes this advert.
+   * Calls the AST service for another advert.
+   */
   public refreshAdvert = (): void => {
     if (!this.adContainer) return;
     window.apntag.refresh([this.id]);
   };
 
+  /**
+   * Initiate another automatic refresh.
+   * This will increment the refresh counter, then refresh the advert.
+   * This method will not initiate the next refresh timer
+   */
   private autoRefresh = (): void => {
     this.refreshCounter++;
     this.refreshTimeout = undefined;
